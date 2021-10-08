@@ -5,32 +5,29 @@ dir()
 library(tidyverse)
 library(lubridate)
 
-gen_mx <- read.csv("gen_ago_2021.csv", skip=8)
+gen_mx <- read_csv("gen_ago_2021.csv", skip=7)
 
 class(gen_mx)
 
-gen_long <- gen_mx %>% 
-  gather(key = Tipo, value = Generación, - Sistema, Dia, Hora)
-         
 #Eolica, Fotovoltaica, Biomasa, Carboelectrica, `Ciclo Combinado`,
 #`Combustion Interna`, Geotermoelectrica, Hidroelectrica, Nucleoelectrica,
 #`Termica Convencional`, `Turbo Gas`  
-  
-#select(Dia, Hora, Tipo) %>% 
-#rename(
-# day = Día,
-# hour = Hora,
-# source = Tipo,
-# gen = Generación
-# ) 
-#%>% 
-# count()
-  
+
+gen_long <- gen_mx %>% 
+  gather(key = Tipo, value = Gen, -Sistema, -Dia, -Hora) %>% 
+ select(Dia, Hora, Tipo, Gen)%>% 
+rename(
+ day = Dia,
+ hour = Hora,
+ source = Tipo,
+ gen = Gen
+ )%>% 
+count(source)%>% 
 mutate(source = case_when(source == "Biomasa" ~ "Biomasa",
-                          source == "Carboelectrica" ~ "Carbon".
+                          source == "Carboelectrica" ~ "Carbon",
                           source == "Ciclo Combinado" ~ "Gas",
                           source == "Combustion Interna" ~ "Petroleo",
-                          Source == "Eolica" ~ "Viento",
+                          source == "Eolica" ~ "Viento",
                           source == "Fotovoltaica" ~ "Sol",
                           source == "Geotermoelectrica" ~ "Geotermia",
                           source == "Hidroelectrica" ~ "Agua",
@@ -38,7 +35,9 @@ mutate(source = case_when(source == "Biomasa" ~ "Biomasa",
                           source == "Termica Convencional" ~ "Petroleo",
                           source == "Turbo Gas" ~ "Petroleo"
                           ))
-#count (source)
+
+gen_long %>%
+  count(source)
 
 
 
